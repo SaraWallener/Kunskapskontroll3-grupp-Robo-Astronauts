@@ -1,4 +1,5 @@
 function Game() {
+  
   // Spel saker hamnar här  
   console.log('Start')
   this.click('.card')
@@ -10,13 +11,12 @@ Game.prototype.click = (className) => {
     c.addEventListener('click', (value) => {
       console.log(value.target)
     })
+
   });
 }
 
-function MemoryCard(){
+function MemoryCard() {
   new Game();
 };
 
-
-export {MemoryCard}
-
+export { MemoryCard }
