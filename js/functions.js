@@ -1,6 +1,7 @@
 // Global Variabel för spara öppna kort
 let openedCards = [];
-
+let matchedCards = []
+let moves = 0;
 function Game(apiKey) {
     let images = [[], []];
     getData(apiKey).then(data => {
@@ -17,7 +18,7 @@ function Game(apiKey) {
 }
 
 async function getData(apiKey) {
-    const url = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&text=nature&media=photos&per_page=12&page=1&format=json&nojsoncallback=1`;
+    const url = `https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=${apiKey}&text=dogs&tags=dogs&media=photos&per_page=12&page=1&format=json&nojsoncallback=1`;
     let response = await fetch(url);
     return response.json()
 }
@@ -42,7 +43,6 @@ function imageGeneration(images) {
             let secret = images[i][j].secret;
             let server = images[i][j].server;
             let size = 'q';
-
             result = `https://live.staticflickr.com/${server}/${id}_${secret}_${size}.jpg`;
             convertNodeListToArray.push(result);
         }
@@ -50,6 +50,12 @@ function imageGeneration(images) {
     }
     shuffle(convertNodeListToArray)
 }
+
+/**
+ * Blandar array index i olika ordning.
+ * @param Ideé från https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array
+ * 
+ */
 
 function shuffle(a) {
     var j, x, i;
@@ -80,30 +86,49 @@ function CardOpen(value) {
             saveCard(openedCards)
         } else {
             setTimeout(function () {
-                putBackCard(openedCards)
-            }, 1100);
+                PutBackCard(openedCards)
+            }, 500);
         }
     };
 }
 
 function saveCard(card) {
-    console.log('hurra')  
+    console.log('hurra')
     card[0].target.classList.add('disabled');
     card[1].target.classList.add('disabled');
     card[0].path[1].classList.add('disabled');
     card[1].path[1].classList.add('disabled');
+
+    matchedCards.push(card[0], card[1]);
+    console.log(matchedCards);
+    if (matchedCards.length === 24) {
+        gameOver();
+    }
     // Tömmer arrayen för kunna göra ny koll
     openedCards = [];
+
 
 }
 
-function putBackCard(card) {
+function PutBackCard(card) {
     console.log('buu')
     card[0].target.classList.add('hide');
     card[1].target.classList.add('hide');
-
+    addCount()
     // Tömmer arrayen för kunna göra ny koll
     openedCards = [];
+}
+
+function gameOver() {
+    const gameboard = document.querySelector('.memory-container');
+    gameboard.classList.add('disabled');
+}
+
+function addCount() {
+    moves++;
+    const movesBlock = document.querySelector('.score');
+    console.log(movesBlock)
+    return movesBlock.textContent = moves;
 }
 
 // Prototypes
@@ -117,6 +142,8 @@ Game.prototype.match = function (className) {
         })
     });
 }
+
+
 
 //Vi skickar ut Game functions till Main.js
 export { Game };
